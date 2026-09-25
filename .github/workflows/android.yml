@@ -20,6 +20,12 @@ jobs:
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
+      with:
+        # The action defaults to `packages: tools platform-tools`, but the legacy
+        # `tools` package was removed from the Google SDK repository, so
+        # `sdkmanager tools` now fails with "Failed to find package 'tools'"
+        # and kills the job before Gradle ever runs. Only request what we need.
+        packages: 'platform-tools'
 
     - uses: gradle/actions/setup-gradle@v3
 
