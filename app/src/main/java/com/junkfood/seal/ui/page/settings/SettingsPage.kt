@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import com.junkfood.seal.App
 import com.junkfood.seal.R
 import com.junkfood.seal.ui.common.Route
+import com.junkfood.seal.ui.common.plus
 import com.junkfood.seal.ui.component.BackButton
 import com.junkfood.seal.ui.component.FloatingNavBarInset
 import com.junkfood.seal.ui.component.PreferencesHintCard
