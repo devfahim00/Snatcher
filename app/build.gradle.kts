@@ -100,9 +100,14 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            if (keystorePropertiesFile.exists()) {
-                signingConfig = signingConfigs.getByName("githubPublish")
-            }
+            signingConfig =
+                if (keystorePropertiesFile.exists()) {
+                    signingConfigs.getByName("githubPublish")
+                } else {
+                    // No release keystore available (e.g. CI without secrets) — fall back to
+                    // the auto-generated debug key so the APK is at least installable.
+                    signingConfigs.getByName("debug")
+                }
         }
         debug {
             if (keystorePropertiesFile.exists()) {
