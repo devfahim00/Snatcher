@@ -20,18 +20,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Subscriptions
-import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Subscriptions
 import androidx.compose.material.icons.outlined.Terminal
-import androidx.compose.material.icons.outlined.VolunteerActivism
-import androidx.compose.material.icons.rounded.BugReport
 import androidx.compose.material.icons.rounded.Cookie
 import androidx.compose.material.icons.rounded.Folder
 import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.SettingsApplications
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.HorizontalDivider
@@ -176,26 +172,6 @@ fun NavigationDrawerSheetContent(
         Spacer(Modifier.height(72.dp))
         ProvideTextStyle(MaterialTheme.typography.labelLarge) {
             NavigationDrawerItem(
-                label = { Text(stringResource(R.string.download_queue)) },
-                icon = { Icon(Icons.Filled.Download, null) },
-                onClick = {
-                    scope
-                        .launch { onDismissRequest() }
-                        .invokeOnCompletion { onNavigateToRoute(Route.HOME) }
-                },
-                selected = currentRoute == Route.HOME,
-            )
-            NavigationDrawerItem(
-                label = { Text(stringResource(R.string.downloads_history)) },
-                icon = { Icon(Icons.Outlined.Subscriptions, null) },
-                onClick = {
-                    scope
-                        .launch { onDismissRequest() }
-                        .invokeOnCompletion { onNavigateToRoute(Route.DOWNLOADS) }
-                },
-                selected = currentRoute == Route.DOWNLOADS,
-            )
-            NavigationDrawerItem(
                 label = { Text(stringResource(R.string.custom_command)) },
                 icon = { Icon(Icons.Outlined.Terminal, null) },
                 onClick = {
@@ -204,27 +180,6 @@ fun NavigationDrawerSheetContent(
                         .invokeOnCompletion { onNavigateToRoute(Route.TASK_LIST) }
                 },
                 selected = currentRoute == Route.TASK_LIST,
-            )
-            NavigationDrawerItem(
-                label = { Text(stringResource(R.string.settings)) },
-                icon = { Icon(Icons.Outlined.Settings, null) },
-                onClick = {
-                    scope
-                        .launch { onDismissRequest() }
-                        .invokeOnCompletion { onNavigateToRoute(Route.SETTINGS) }
-                },
-                selected = currentRoute == Route.SETTINGS_PAGE,
-            )
-
-            NavigationDrawerItem(
-                label = { Text(stringResource(R.string.sponsor)) },
-                icon = { Icon(Icons.Outlined.VolunteerActivism, null) },
-                onClick = {
-                    scope
-                        .launch { onDismissRequest() }
-                        .invokeOnCompletion { onNavigateToRoute(Route.DONATE) }
-                },
-                selected = currentRoute == Route.DONATE,
             )
 
             if (showQuickSettings) {
@@ -241,19 +196,6 @@ fun NavigationDrawerSheetContent(
                         modifier = Modifier,
                     )
                 }
-
-                NavigationDrawerItem(
-                    label = { Text(stringResource(R.string.general_settings)) },
-                    icon = { Icon(Icons.Rounded.SettingsApplications, null) },
-                    onClick = {
-                        scope
-                            .launch { onDismissRequest() }
-                            .invokeOnCompletion {
-                                onNavigateToRoute(Route.GENERAL_DOWNLOAD_PREFERENCES)
-                            }
-                    },
-                    selected = currentRoute == Route.GENERAL_DOWNLOAD_PREFERENCES,
-                )
 
                 NavigationDrawerItem(
                     label = { Text(stringResource(R.string.download_directory)) },
@@ -275,17 +217,6 @@ fun NavigationDrawerSheetContent(
                             .invokeOnCompletion { onNavigateToRoute(Route.COOKIE_PROFILE) }
                     },
                     selected = currentRoute == Route.COOKIE_PROFILE,
-                )
-
-                NavigationDrawerItem(
-                    label = { Text(stringResource(R.string.trouble_shooting)) },
-                    icon = { Icon(Icons.Rounded.BugReport, null) },
-                    onClick = {
-                        scope
-                            .launch { onDismissRequest() }
-                            .invokeOnCompletion { onNavigateToRoute(Route.TROUBLESHOOTING) }
-                    },
-                    selected = currentRoute == Route.TROUBLESHOOTING,
                 )
 
                 NavigationDrawerItem(
@@ -370,19 +301,6 @@ fun NavigationRailContent(
             modifier = Modifier,
             selected = currentTopDestination == Route.DOWNLOADS,
             onClick = { onNavigateToRoute(Route.DOWNLOADS) },
-        )
-
-        NavigationRailItemVariant(
-            icon = {
-                Icon(
-                    if (currentTopDestination == Route.TASK_LIST) Icons.Filled.Terminal
-                    else Icons.Outlined.Terminal,
-                    stringResource(R.string.custom_command),
-                )
-            },
-            modifier = Modifier,
-            selected = currentTopDestination == Route.TASK_LIST,
-            onClick = { onNavigateToRoute(Route.TASK_LIST) },
         )
 
         NavigationRailItemVariant(

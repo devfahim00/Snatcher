@@ -20,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Subscriptions
-import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -60,8 +59,12 @@ data class FloatingNavDestination(
     val icon: ImageVector,
 )
 
-/** Nominal height of the bar plus its outer margin, used by [FloatingNavBarSpacer]. */
-private val FloatingNavBarHeight = 88.dp
+/**
+ * Total vertical space the floating bar occupies above the navigation bar inset, including its
+ * outer margins and breathing room. Host screens use this (directly or via [FloatingNavBarSpacer])
+ * as bottom content padding so nothing interactive ends up underneath the bar.
+ */
+val FloatingNavBarInset = 108.dp
 
 /**
  * Floating, pill-shaped, frosted-glass bottom navigation bar.
@@ -212,21 +215,21 @@ private fun FloatingNavBarItem(
  */
 @Composable
 fun FloatingNavBarSpacer(modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxWidth().height(FloatingNavBarHeight))
+    Box(modifier = modifier.fillMaxWidth().height(FloatingNavBarInset))
 }
 
 /**
- * Ready-made destination list matching Seal's top-level routes.
+ * Ready-made destination list matching Snatcher's top-level routes.
  *
- * The ids mirror `Route.HOME`, `Route.DOWNLOADS` and `Route.TASK_LIST` so the host can pass the
+ * The ids mirror `Route.HOME`, `Route.DOWNLOADS` and `Route.SETTINGS_PAGE` so the host can pass the
  * current navigation route straight in as `currentDestinationId`.
  */
 @Composable
 fun rememberDefaultFloatingNavDestinations(): List<FloatingNavDestination> {
     val home = stringResource(R.string.download_queue)
     val downloads = stringResource(R.string.downloads_history)
-    val tasks = stringResource(R.string.running_tasks)
-    return remember(home, downloads, tasks) {
+    val settings = stringResource(R.string.settings)
+    return remember(home, downloads, settings) {
         listOf(
             FloatingNavDestination(id = "home", label = home, icon = Icons.Outlined.Download),
             FloatingNavDestination(
@@ -235,9 +238,9 @@ fun rememberDefaultFloatingNavDestinations(): List<FloatingNavDestination> {
                 icon = Icons.Outlined.Subscriptions,
             ),
             FloatingNavDestination(
-                id = "task_list",
-                label = tasks,
-                icon = Icons.Outlined.Terminal,
+                id = "settings_page",
+                label = settings,
+                icon = Icons.Outlined.Settings,
             ),
         )
     }
@@ -253,7 +256,7 @@ private fun FloatingNavBarPreview() {
                     listOf(
                         FloatingNavDestination("home", "Queue", Icons.Outlined.Download),
                         FloatingNavDestination("download_history", "Downloads", Icons.Outlined.Subscriptions),
-                        FloatingNavDestination("task_list", "Tasks", Icons.Outlined.Terminal),
+                        FloatingNavDestination("settings_page", "Settings", Icons.Outlined.Settings),
                     ),
                 currentDestinationId = "download_history",
                 onDestinationSelected = {},

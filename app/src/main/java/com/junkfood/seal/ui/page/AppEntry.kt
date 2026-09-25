@@ -55,8 +55,6 @@ import com.junkfood.seal.ui.page.downloadv2.configure.DownloadDialogViewModel
 import com.junkfood.seal.ui.page.downloadv2.DownloadPageV2
 import com.junkfood.seal.ui.page.settings.SettingsPage
 import com.junkfood.seal.ui.page.settings.about.AboutPage
-import com.junkfood.seal.ui.page.settings.about.CreditsPage
-import com.junkfood.seal.ui.page.settings.about.SponsorsPage
 import com.junkfood.seal.ui.page.settings.about.UpdatePage
 import com.junkfood.seal.ui.page.settings.appearance.AppearancePreferences
 import com.junkfood.seal.ui.page.settings.appearance.DarkThemePreferences
@@ -80,7 +78,7 @@ import org.koin.androidx.compose.koinViewModel
 private const val TAG = "HomeEntry"
 
 private val TopDestinations =
-    listOf(Route.HOME, Route.TASK_LIST, Route.SETTINGS_PAGE, Route.DOWNLOADS)
+    listOf(Route.HOME, Route.SETTINGS_PAGE, Route.DOWNLOADS)
 
 @Composable
 fun AppEntry(dialogViewModel: DownloadDialogViewModel) {
@@ -250,13 +248,9 @@ fun NavGraphBuilder.settingsGraph(
         animatedComposable(Route.ABOUT) {
             AboutPage(
                 onNavigateBack = onNavigateBack,
-                onNavigateToCreditsPage = { onNavigateTo(Route.CREDITS) },
                 onNavigateToUpdatePage = { onNavigateTo(Route.AUTO_UPDATE) },
-                onNavigateToDonatePage = { onNavigateTo(Route.DONATE) },
             )
         }
-        animatedComposable(Route.DONATE) { SponsorsPage(onNavigateBack) }
-        animatedComposable(Route.CREDITS) { CreditsPage(onNavigateBack) }
         animatedComposable(Route.AUTO_UPDATE) { UpdatePage(onNavigateBack) }
         animatedComposable(Route.APPEARANCE) {
             AppearancePreferences(onNavigateBack = onNavigateBack, onNavigateTo = onNavigateTo)

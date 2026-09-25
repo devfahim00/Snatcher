@@ -8,7 +8,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +31,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.DriveFileMove
 import androidx.compose.material.icons.outlined.DeleteSweep
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.PlayCircleOutline
 import androidx.compose.material.icons.outlined.Restore
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.rememberModalBottomSheetState
@@ -65,7 +66,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -93,12 +94,14 @@ import com.junkfood.seal.ui.component.BackButton
 import com.junkfood.seal.ui.component.CheckBoxItem
 import com.junkfood.seal.ui.component.ConfirmButton
 import com.junkfood.seal.ui.component.DismissButton
+import com.junkfood.seal.ui.component.FloatingNavBarInset
+import com.junkfood.seal.ui.component.GlassSurface
 import com.junkfood.seal.ui.component.MediaListItem
 import com.junkfood.seal.ui.component.SealDialog
 import com.junkfood.seal.ui.component.SealSearchBar
 import com.junkfood.seal.ui.component.VideoFilterChip
-import com.junkfood.seal.ui.svg.DynamicColorImageVectors
-import com.junkfood.seal.ui.svg.drawablevectors.videoSteaming
+import com.junkfood.seal.ui.theme.GlassAlpha
+import com.junkfood.seal.ui.theme.Spacing
 import com.junkfood.seal.util.AUDIO_REGEX
 import com.junkfood.seal.util.FileUtil
 import com.junkfood.seal.util.ToastUtil
@@ -418,23 +421,39 @@ fun VideoListPage(viewModel: VideoListViewModel = koinViewModel(), onNavigateBac
     ) { innerPadding ->
         if (fullVideoList.isEmpty())
             Box(modifier = Modifier.fillMaxSize()) {
-                val painter =
-                    rememberVectorPainter(image = DynamicColorImageVectors.videoSteaming())
+                // Simple empty state: a plain glass icon badge instead of the old illustration.
                 Column(
                     modifier = Modifier.align(Alignment.Center).widthIn(max = 360.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Image(
-                        painter = painter,
-                        contentDescription = null,
-                        modifier =
-                            Modifier.padding(vertical = 20.dp)
-                                .fillMaxWidth(0.5f)
-                                .widthIn(max = 240.dp),
-                    )
+                    GlassSurface(
+                        shape = CircleShape,
+                        containerColor =
+                            MaterialTheme.colorScheme.surfaceContainerHigh.copy(
+                                alpha = GlassAlpha.Surface
+                            ),
+                    ) {
+                        Box(
+                            modifier = Modifier.size(88.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.PlayCircleOutline,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(36.dp),
+                            )
+                        }
+                    }
+                    Spacer(Modifier.height(Spacing.large))
                     Text(
                         text = stringResource(R.string.no_downloaded_media),
-                        style = MaterialTheme.typography.labelLarge,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Text(
+                        text = stringResource(R.string.download_hint),
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
@@ -446,7 +465,12 @@ fun VideoListPage(viewModel: VideoListViewModel = koinViewModel(), onNavigateBac
                 else -> 1
             }
         val span: (LazyGridItemSpanScope) -> GridItemSpan = { GridItemSpan(cellCount) }
-        LazyColumn(modifier = Modifier, state = lazyListState, contentPadding = innerPadding) {
+        LazyColumn(
+            modifier = Modifier,
+            state = lazyListState,
+            contentPadding =
+                innerPadding + PaddingValues(bottom = FloatingNavBarInset),
+        ) {
             if (fullVideoList.isNotEmpty()) {
                 item {
                     Column {

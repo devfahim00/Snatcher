@@ -1,6 +1,7 @@
 package com.junkfood.seal.ui.component
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,6 +12,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
@@ -20,11 +23,12 @@ import com.junkfood.seal.ui.theme.GlassAlpha
 import com.junkfood.seal.ui.theme.glassColors
 
 /**
- * Lightweight frosted-glass container used by the refreshed surfaces.
+ * Frosted-glass container used across Snatcher's surfaces.
  *
- * The effect is intentionally cheap: a translucent surface container plus a hairline border. It
- * reads as "glass" on both light and dark themes without paying the cost of a real blur pass, which
- * keeps scrolling smooth on low-end devices.
+ * The effect stays cheap on purpose: a translucent surface container, a hairline gradient border
+ * and a soft diagonal sheen overlay that reads as light catching the top edge of the glass. No
+ * real blur pass is involved, which keeps scrolling smooth on low-end devices while still giving
+ * the unmistakable glassy look on both light and dark themes.
  */
 @Composable
 fun GlassSurface(
@@ -37,15 +41,42 @@ fun GlassSurface(
     content: @Composable BoxScope.() -> Unit,
 ) {
     val colors = glassColors(strong = strong)
+    val borderBrush =
+        Brush.linearGradient(
+            colors =
+                listOf(
+                    Color.White.copy(alpha = GlassAlpha.SheenTop),
+                    colors.border,
+                    Color.White.copy(alpha = GlassAlpha.SheenTop / 2),
+                ),
+        )
+    val sheenBrush =
+        Brush.linearGradient(
+            colors =
+                listOf(
+                    Color.White.copy(alpha = GlassAlpha.Sheen),
+                    Color.White.copy(alpha = GlassAlpha.Sheen / 3),
+                    Color.Transparent,
+                ),
+        )
     Surface(
         modifier = modifier,
         shape = shape,
         color = containerColor ?: colors.container,
-        border = BorderStroke(borderWidth, colors.border),
+        border = BorderStroke(borderWidth, borderBrush),
         tonalElevation = 0.dp,
         shadowElevation = 0.dp,
     ) {
-        Box(modifier = Modifier.padding(contentPadding), content = content)
+        Box(modifier = Modifier.padding(contentPadding)) {
+            content()
+            // Diagonal sheen sitting on top of the content, clipped to the surface shape.
+            Box(
+                modifier =
+                    Modifier.matchParentSize()
+                        .clip(shape)
+                        .background(sheenBrush, shape)
+            )
+        }
     }
 }
 

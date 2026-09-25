@@ -56,6 +56,12 @@ object GlassAlpha {
     const val Border = 0.35f
     const val SkeletonBase = 0.10f
     const val SkeletonHighlight = 0.22f
+
+    /** Intensity of the diagonal sheen overlay applied on glass surfaces. */
+    const val Sheen = 0.14f
+
+    /** Top-edge highlight of the gradient glass border. */
+    const val SheenTop = 0.32f
 }
 
 /** Resolved glass colours for the current theme. */

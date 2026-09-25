@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridScope
@@ -54,6 +55,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.junkfood.seal.R
+import com.junkfood.seal.ui.theme.GlassAlpha
 import com.junkfood.seal.ui.theme.SealTheme
 import com.junkfood.seal.util.Format
 import com.junkfood.seal.util.VideoInfo
@@ -329,16 +331,24 @@ fun FormatItem(
             label = "",
         )
 
+    // Unselected cards sit on a translucent glass surface so the format grid reads as
+    // floating panes instead of opaque blocks.
     val animatedContainerColor by
         animateColorAsState(
-            if (selected) containerColor else MaterialTheme.colorScheme.surface,
+            if (selected) containerColor
+            else
+                MaterialTheme.colorScheme.surfaceContainerHigh.copy(
+                    alpha = GlassAlpha.Surface
+                ),
             animationSpec = tween(100),
             label = "",
         )
 
     val animatedOutlineColor by
         animateColorAsState(
-            targetValue = if (selected) outlineColor else MaterialTheme.colorScheme.outlineVariant,
+            targetValue =
+                if (selected) outlineColor
+                else MaterialTheme.colorScheme.outlineVariant.copy(alpha = GlassAlpha.Border),
             animationSpec = tween(100),
             label = "",
         )
@@ -542,12 +552,20 @@ fun FormatSubtitle(
     text: String,
     color: Color = MaterialTheme.colorScheme.primary,
 ) {
-    Text(
-        text = text,
+    // Section headers render as small tinted pills — a lighter, more modern take than
+    // plain coloured text.
+    Surface(
         modifier = modifier,
-        color = color,
-        style = MaterialTheme.typography.titleSmall,
-    )
+        color = color.copy(alpha = 0.12f),
+        shape = RoundedCornerShape(10.dp),
+    ) {
+        Text(
+            text = text,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+            color = color,
+            style = MaterialTheme.typography.labelLarge,
+        )
+    }
 }
 
 @Preview

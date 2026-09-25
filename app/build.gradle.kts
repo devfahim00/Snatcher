@@ -44,7 +44,7 @@ android {
     buildFeatures { buildConfig = true }
 
     defaultConfig {
-        applicationId = "com.junkfood.seal"
+        applicationId = "com.devfahim00.snatcher"
         minSdk = 24
         targetSdk = 35
         versionCode = 200_000_150
@@ -115,7 +115,7 @@ android {
             }
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
-            resValue("string", "app_name", "Seal Debug")
+            resValue("string", "app_name", "Snatcher Debug")
         }
     }
 
@@ -130,7 +130,7 @@ android {
         create("githubPreview") {
             dimension = "publishChannel"
             applicationIdSuffix = ".preview"
-            resValue("string", "app_name", "Seal Preview")
+            resValue("string", "app_name", "Snatcher Preview")
         }
 
         create("fdroid") {
@@ -144,7 +144,7 @@ android {
     applicationVariants.all {
         outputs.all {
             (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
-                "Seal-${defaultConfig.versionName}-${name}.apk"
+                "Snatcher-${defaultConfig.versionName}-${name}.apk"
         }
     }
 

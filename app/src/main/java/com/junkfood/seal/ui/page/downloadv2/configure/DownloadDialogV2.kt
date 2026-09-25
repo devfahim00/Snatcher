@@ -29,7 +29,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -74,6 +73,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.background
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -95,6 +96,7 @@ import com.junkfood.seal.ui.common.HapticFeedback.longPressHapticFeedback
 import com.junkfood.seal.ui.common.motion.materialSharedAxisX
 import com.junkfood.seal.ui.component.ButtonChip
 import com.junkfood.seal.ui.component.DrawerSheetSubtitle
+import com.junkfood.seal.ui.component.GlassSurface
 import com.junkfood.seal.ui.component.OutlinedButtonWithIcon
 import com.junkfood.seal.ui.component.SealModalBottomSheet
 import com.junkfood.seal.ui.component.SealModalBottomSheetM2Variant
@@ -115,6 +117,8 @@ import com.junkfood.seal.ui.page.settings.command.CommandTemplateDialog
 import com.junkfood.seal.ui.page.settings.format.AudioQuickSettingsDialog
 import com.junkfood.seal.ui.page.settings.format.VideoQuickSettingsDialog
 import com.junkfood.seal.ui.page.settings.network.CookiesQuickSettingsDialog
+import com.junkfood.seal.ui.theme.CornerRadius
+import com.junkfood.seal.ui.theme.GlassAlpha
 import com.junkfood.seal.ui.theme.SealTheme
 import com.junkfood.seal.util.AUDIO_CONVERSION_FORMAT
 import com.junkfood.seal.util.AUDIO_CONVERT
@@ -885,7 +889,10 @@ private fun SingleChoiceItem(
     val color by
         animateColorAsState(
             if (selected) MaterialTheme.colorScheme.secondaryContainer
-            else MaterialTheme.colorScheme.surfaceContainerLow,
+            else
+                MaterialTheme.colorScheme.surfaceContainerHigh.copy(
+                    alpha = GlassAlpha.Surface
+                ),
             label = "",
         )
 
@@ -924,11 +931,20 @@ private fun SingleChoiceItem(
 @Composable
 internal fun Header(modifier: Modifier = Modifier, icon: ImageVector, title: String) {
     Column(modifier = modifier) {
-        Icon(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            imageVector = icon,
-            contentDescription = null,
-        )
+        // Icon in a softly tinted glass badge instead of a bare glyph.
+        GlassSurface(
+            shape = CornerRadius.mediumShape,
+            containerColor =
+                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = GlassAlpha.SurfaceStrong),
+        ) {
+            Box(modifier = Modifier.size(56.dp), contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                )
+            }
+        }
         Text(
             text = title,
             style = MaterialTheme.typography.headlineSmall,
@@ -1129,47 +1145,44 @@ private fun ActionButtons(
             Download
         }
 
-    val state = rememberLazyListState()
-    LazyRow(
-        modifier = modifier.fillMaxWidth().padding(top = 12.dp),
-        horizontalArrangement = Arrangement.End,
-        state = state,
+    // Modern full-width action row: a quiet cancel button plus one prominent pill-shaped
+    // confirm button that animates its label as the selected action changes.
+    Row(
+        modifier = modifier.fillMaxWidth().padding(top = 20.dp, bottom = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        item {
-            OutlinedButtonWithIcon(
-                modifier = Modifier.padding(horizontal = 12.dp),
-                onClick = onCancel,
-                icon = Icons.Outlined.Cancel,
-                text = stringResource(R.string.cancel),
-            )
-        }
-        item {
-            Button(
-                modifier = Modifier,
-                onClick = {
-                    when (action) {
-                        FetchInfo -> onFetchInfo()
-                        Download -> onDownload()
-                        StartTask -> onTaskStart()
-                    }
+        OutlinedButtonWithIcon(
+            modifier = Modifier.weight(1f),
+            onClick = onCancel,
+            icon = Icons.Outlined.Cancel,
+            text = stringResource(R.string.cancel),
+        )
+        Button(
+            modifier = Modifier.weight(2f),
+            shape = CornerRadius.pillShape,
+            onClick = {
+                when (action) {
+                    FetchInfo -> onFetchInfo()
+                    Download -> onDownload()
+                    StartTask -> onTaskStart()
+                }
+            },
+            contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
+            enabled = canProceed,
+        ) {
+            AnimatedContent(
+                targetState = action,
+                label = "",
+                transitionSpec = {
+                    (fadeIn(animationSpec = tween(220, delayMillis = 90))).togetherWith(
+                        fadeOut(animationSpec = tween(90))
+                    )
                 },
-                contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
-                enabled = canProceed,
-            ) {
-                AnimatedContent(
-                    targetState = action,
-                    label = "",
-                    transitionSpec = {
-                        (fadeIn(animationSpec = tween(220, delayMillis = 90))).togetherWith(
-                            fadeOut(animationSpec = tween(90))
-                        )
-                    },
-                ) { action ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        action.Icon()
-                        action.Label()
-                    }
+            ) { action ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    action.Icon()
+                    action.Label()
                 }
             }
         }
