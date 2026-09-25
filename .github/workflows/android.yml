@@ -37,14 +37,14 @@ jobs:
       run: chmod +x gradlew
 
     - name: Build with Gradle
-      run: ./gradlew assembleRelease --stacktrace
+      run: ./gradlew assembleGenericRelease --stacktrace
 
     - name: Sign app APK
       id: sign_app
       if: env.HAS_SIGNING == 'true'
       uses: ilharp/sign-android-release@nightly
       with:
-        releaseDir: app/build/outputs/apk/release
+        releaseDir: app/build/outputs/apk/generic/release
         signingKey: ${{ secrets.SIGNING_KEY }}
         keyAlias: ${{ secrets.ALIAS }}
         keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
@@ -55,7 +55,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: signed-apks
-        path: app/build/outputs/apk/release/*-arm64-v8a-release-signed.apk
+        path: app/build/outputs/apk/generic/release/*-arm64-v8a-release-signed.apk
         if-no-files-found: error
         retention-days: 20
 
@@ -64,6 +64,6 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: unsigned-apks
-        path: app/build/outputs/apk/release/*.apk
+        path: app/build/outputs/apk/generic/release/*.apk
         if-no-files-found: error
         retention-days: 20
