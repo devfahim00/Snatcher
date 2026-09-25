@@ -2,11 +2,15 @@ name: Build Release APK
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ "main" ]
 
 jobs:
 
   build:
     runs-on: ubuntu-latest
+    env:
+      HAS_SIGNING: ${{ secrets.SIGNING_KEY != '' }}
 
     steps:
     - uses: actions/checkout@v4
@@ -20,19 +24,18 @@ jobs:
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
-      with:
-        # The action defaults to `packages: tools platform-tools`, but the legacy
-        # `tools` package was removed from the Google SDK repository, so
-        # `sdkmanager tools` now fails with "Failed to find package 'tools'"
-        # and kills the job before Gradle ever runs. Only request what we need.
-        packages: 'platform-tools'
 
     - uses: gradle/actions/setup-gradle@v3
 
-    - run: gradle assembleRelease
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Build with Gradle
+      run: ./gradlew assembleRelease --stacktrace
 
     - name: Sign app APK
       id: sign_app
+      if: env.HAS_SIGNING == 'true'
       uses: ilharp/sign-android-release@nightly
       with:
         releaseDir: app/build/outputs/apk/release
@@ -41,10 +44,20 @@ jobs:
         keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
         keyPassword: ${{ secrets.KEY_PASSWORD }}
 
-    - name: Upload Artifact
+    - name: Upload signed APK
+      if: env.HAS_SIGNING == 'true'
       uses: actions/upload-artifact@v4
       with:
         name: signed-apks
         path: app/build/outputs/apk/release/*-arm64-v8a-release-signed.apk
+        if-no-files-found: error
+        retention-days: 20
+
+    - name: Upload unsigned APK
+      if: env.HAS_SIGNING != 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: unsigned-apks
+        path: app/build/outputs/apk/release/*.apk
         if-no-files-found: error
         retention-days: 20
